@@ -10,6 +10,8 @@
   },
   "permissions": {
     "alarms":{},
+    "audio-capture": {},
+    "video-capture": {},
     "audio-channel-notification":{},
     "contacts":{ "access": "readcreate" },
     "desktop-notification":{},

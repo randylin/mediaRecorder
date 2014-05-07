@@ -9,39 +9,6 @@ var audioout = document.createElement('audio');
 var videoReplay;
 
 
-function saveToStorage(blob, storage, filename, partInfo, isRetry) {
-    pendingStorageWrites++;
-    var dstorage = navigator.getDeviceStorage(storage);
-    var req = dstorage.delete(filename);
-    req = dstorage.addNamed(blob, filename);
-    req.onerror = function() {
-      console.warn('failed to save attachment to', storage, filename,
-                   'type:', blob.type);
-      pendingStorageWrites--;
-      // if we failed to unique the file after appending junk, just give up
-      if (isRetry) {
-        if (pendingStorageWrites === 0)
-          done();
-        return;
-      }
-      // retry by appending a super huge timestamp to the file before its
-      // extension.
-      var idxLastPeriod = filename.lastIndexOf('.');
-      if (idxLastPeriod === -1)
-        idxLastPeriod = filename.length;
-      filename = filename.substring(0, idxLastPeriod) + '-' + Date.now() +
-                   filename.substring(idxLastPeriod);
-      saveToStorage(blob, storage, filename, partInfo, true);
-    };
-    req.onsuccess = function() {
-      console.log('saved attachment to', storage, filename, 'type:', blob.type);
-      partInfo.file = [storage, filename];
-      if (--pendingStorageWrites === 0)
-        done();
-    };
-}
-
-
 function gUM() {
   navigator.mozGetUserMedia({audio:true},
                        function(s) {
@@ -126,7 +93,8 @@ function done() {
 var pendingStorageWrites;
 function saveToStorage(blob, storage, filename, partInfo, isRetry) {
     pendingStorageWrites++;
-    var dstorage = navigator.getDeviceStorage(storage);
+    var dstorage = navigator.getDeviceStorages(storage)[1];
+    // use index 1 in flame to indicate external storage
     var req = dstorage.delete(filename);
     req = dstorage.addNamed(blob, filename);
     req.onerror = function() {
@@ -160,6 +128,8 @@ function SaveBlobSD() {
   var fname;
   if (mBlob.type === 'audio/ogg') {
     fname = "data.opus";
+  } else if (mBlob.type === 'audio/3gpp') {
+    fname = "data.3gpp";
   } else if (mBlob.type === 'video/mp4') {
     fname = "data.mp4";
   } else if (mBlob.type === 'video/webm') {
@@ -179,6 +149,8 @@ function SaveBlob() {
   downloadLink.href = window.URL.createObjectURL(blob);
   if (mBlob.type === 'audio/ogg') {
     downloadLink.download = "data.opus";
+  } else if (mBlob.type === 'audio/3gpp') {
+    downloadLink.download = "data.3gpp";
   } else if (mBlob.type === 'video/mp4') {
     downloadLink.download = "data.mp4";
   } else if (mBlob.type === 'video/webm') {
