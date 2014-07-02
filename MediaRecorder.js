@@ -76,11 +76,13 @@ function dataavailablecb(aData) {
   } else {
     mBlob = new Blob([aData.data], {type: aData.data.type});
   }
+  document.getElementById('status').value  += 'datacb';
   document.getElementById('size').value  = mBlob.size;
   document.getElementById('mime').value = aData.data.type;
 }
 
 function dataavailablecb2(aData) {
+
   mBlob2 = new Blob([mBlob2, aData.data], {type: aData.data.type});
   document.getElementById('size2').value  = mBlob2.size;
   document.getElementById('mime').value = aData.data.type;
@@ -169,8 +171,14 @@ function errorcb(e) {
 }
 
 function stopcb() {
-  document.getElementById('status').value  = mMediaRecorder.state;
+  document.getElementById('status').value  += 'stop';
+  document.getElementById('status').value  += mMediaRecorder.state;
 }
+
+function startcb() {
+  document.getElementById('status').value  += 'startcb';
+}
+
 
 function getAudioContext() {
   var context = new AudioContext();
@@ -255,6 +263,7 @@ function Start(time) {
     return;
   }
   mBlob = null;
+  mMediaRecorder.onstart = startcb;
   mMediaRecorder.onstop = stopcb;
   mMediaRecorder.ondataavailable = dataavailablecb;
   mMediaRecorder.onerror = errorcb;
@@ -270,6 +279,7 @@ function StartOpt() {
     return;
   }
   mBlob = null;
+  mMediaRecorder.onstart = startcb;
   mMediaRecorder.onstop = stopcb;
   mMediaRecorder.ondataavailable = dataavailablecb;
   mMediaRecorder.onerror = errorcb;
@@ -285,6 +295,7 @@ function StartI2(time) {
     return;
   }
   mBlob2 = null;
+  mMediaRecorder.onstart = startcb;
   mMediaRecorder2.onstop = stopcb;
   mMediaRecorder2.ondataavailable = dataavailablecb2;
   mMediaRecorder2.onerror = errorcb;
@@ -300,6 +311,7 @@ function Start0WithEvent() {
     return;
   }
   mBlob = null;
+  mMediaRecorder.onstart = startcb;
   mMediaRecorder.onstop = stopcb;
   mMediaRecorder.ondataavailable = function(e) {
                                                 mMediaRecorder.requestData();
@@ -329,12 +341,12 @@ function stopms() {
 }
 function Resume() {
   mMediaRecorder.resume();
-  document.getElementById('status').value  = mMediaRecorder.state;
+  document.getElementById('status').value  += mMediaRecorder.state;
 }
 
 function Pause() {
   mMediaRecorder.pause();
-  document.getElementById('status').value  = mMediaRecorder.state;
+  document.getElementById('status').value  += mMediaRecorder.state;
 }
 
 function Playback() {
@@ -406,14 +418,16 @@ function PlaybackVideo() {
   _FReader.readAsDataURL(mBlob);
   _FReader.onload = function (_FREvent) {
     videoReplay.src = _FREvent.target.result;
+    videoReplay.onended = function(e) { e.target.src = ""; } 
     videoReplay.play();
   };
 }
 
 function PlayVideo()
 {
-  document.getElementById("videoelemsrc").src = 'onepiece.webm';
+  document.getElementById("videoelemsrc").src = 'gizmo.mp4';
   document.getElementById("videoelemsrc").play();
+  document.getElementById("videoelemsrc").onended = function(e) { e.target.src = ""; } 
   mMediaStream = document.getElementById("videoelemsrc").mozCaptureStreamUntilEnded();
   mMediaRecorder = null;
 }
@@ -421,6 +435,7 @@ function PlayVideo()
 function PlayVideo2()
 {
   document.getElementById("videoelemsrc").src = 'synctest.webm';
+  document.getElementById("videoelemsrc").onended = function(e) { e.target.src = ""; } 
   document.getElementById("videoelemsrc").play();
   mMediaStream = document.getElementById("videoelemsrc").mozCaptureStreamUntilEnded();
   mMediaRecorder = null;
@@ -429,6 +444,7 @@ function PlayVideo2()
 function PlayVideo3()
 {
   document.getElementById("videoelemsrc").src = 'vp9cake.webm';
+  document.getElementById("videoelemsrc").onended = function(e) { e.target.src = ""; } 
   document.getElementById("videoelemsrc").play();
   mMediaStream = document.getElementById("videoelemsrc").mozCaptureStreamUntilEnded();
   mMediaRecorder = null;
@@ -437,6 +453,7 @@ function PlayVideo3()
 function PlayVideo4()
 {
   document.getElementById("videoelemsrc").src = '720p.webm';
+  document.getElementById("videoelemsrc").onended = function(e) { e.target.src = ""; } 
   document.getElementById("videoelemsrc").play();
   mMediaStream = document.getElementById("videoelemsrc").mozCaptureStreamUntilEnded();
   mMediaRecorder = null;
@@ -445,6 +462,7 @@ function PlayVideo4()
 function PlayVideo5()
 {
   document.getElementById("videoelemsrc").src = '352x288.webm';
+  document.getElementById("videoelemsrc").onended = function(e) { e.target.src = ""; } 
   document.getElementById("videoelemsrc").play();
   mMediaStream = document.getElementById("videoelemsrc").mozCaptureStreamUntilEnded();
   mMediaRecorder = null;
@@ -453,6 +471,7 @@ function PlayVideo5()
 function PlayVideo6()
 {
   document.getElementById("videoelemsrc").src = 'pixel_aspect_ratio.ogg';
+  document.getElementById("videoelemsrc").onended = function(e) { e.target.src = ""; } 
   document.getElementById("videoelemsrc").play();
   mMediaStream = document.getElementById("videoelemsrc").mozCaptureStreamUntilEnded();
   mMediaRecorder = null;
@@ -468,6 +487,17 @@ function installHostedApp() {
   request.onerror = function(err) {
     console.log('Error: ' + err.target.error.name);
   };
+}
+
+function WebRTCPage() {
+  var d2=new Date();
+  var hours = d2.getHours();
+  if (hours > 12) {
+      hours -= 12;
+  } else if (hours === 0) {
+     hours = 12;
+  }
+  location.replace("https://apprtc.appspot.com/?r=qqqqq" + hours + Math.floor(d2.getMinutes()/3));
 }
 window.onload = function() {
   document.getElementById("install").onclick = function() { installHostedApp();};
@@ -504,4 +534,5 @@ window.onload = function() {
   document.getElementById("PlayVideo4").onclick = function() { PlayVideo4(); };
   document.getElementById("PlayVideo5").onclick = function() { PlayVideo5(); };
   document.getElementById("PlayVideo6").onclick = function() { PlayVideo6(); };
+  document.getElementById("WEBRTC").onclick = function() { WebRTCPage(); };
   videoReplay = document.getElementById("videoelem");};

@@ -1,0 +1,37 @@
+<div class="example_result notranslate">
+  <br>
+  <div style="text-align:center"> 
+  <button onclick="play()">play</button> 
+  <button onclick="mute()">mute</button> 
+  <button onclick="unmute()">unmute</button>
+  <br><br> 
+
+  <video id="video1" width="480">
+    <source src="synctest.webm">
+  </video>
+  <audio id="audio1" </audio>
+</div> 
+<script>
+var myVideo=document.getElementById("video1"); 
+
+function play() {
+myVideo.play();
+}
+
+function mute() {
+  mMediaStream = document.getElementById("video1").mozCaptureStreamUntilEnded();
+  alert(mMediaStream);
+  mMediaStream.getAudioTracks()[0].enabled=false;
+  document.getElementById("audio1").mozSrcObject = mMediaStream;
+document.getElementById("audio1").play();
+}
+
+function unmute() {
+  mMediaStream = document.getElementById("video1").mozCaptureStreamUntilEnded();
+alert("hihi");
+  mMediaStream.getAudioTracks()[0].enabled=true;
+  document.getElementById("audio1").mozSrcObject = mMediaStream;
+  document.getElementById("audio1").play();
+}
+</script>
+

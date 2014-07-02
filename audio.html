@@ -1,0 +1,13 @@
+
+<audio controls id="vvv" ></video>
+<script>
+  var a = document.getElementById('vvv');
+  document.getElementById("vvv").src = 'ehren.opus';
+  document.getElementById("vvv").play();
+  var o1 = document.getElementById("vvv").mozCaptureStreamUntilEnded();
+  o2 = new MediaRecorder(o1);
+  o2.onstop = function () { dump("onstop"); }
+setTimeout("o2.start();", 1000 );
+  
+
+</script>
